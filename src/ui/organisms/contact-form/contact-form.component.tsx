@@ -30,9 +30,8 @@ export const ContactForm: FC<IContactFormProps> = ({ email, fullName }): JSX.Ele
   const [disableForm, setDisableForm] = useState(false);
   const { hasCopied, onCopy } = useClipboard(CONTACT_EMAIL);
   const {
-    error: sendContactFormDataError,
-    execute: sendContactFormData,
     loading: isSendContactFormDataLoading,
+    mutateAsync: mutateAsyncSendContactFormData,
     reset: resetSendContactFormData,
   } = useAxiosAction(restModule.sendContactFormData);
 
@@ -50,27 +49,12 @@ export const ContactForm: FC<IContactFormProps> = ({ email, fullName }): JSX.Ele
     }
   }, [email, fullName]);
 
-  useEffect(() => {
-    if (sendContactFormDataError) {
-      toast({
-        title: 'Error',
-        duration: 5000,
-        status: 'error',
-        description: sendContactFormDataError,
-        onCloseComplete: () => {
-          setDisableForm(false);
-          resetSendContactFormData();
-        },
-      });
-    }
-  }, [sendContactFormDataError]);
-
   const handleSubmit = onSubmitWrapper((_values) => {
     setDisableForm(true);
 
-    sendContactFormData(_values).then((_response) => {
-      if (JSON.stringify(_values) === JSON.stringify(_response)) {
-        return toast({
+    mutateAsyncSendContactFormData(_values)
+      .then(() =>
+        toast({
           duration: 5000,
           status: 'success',
           title: 'Thank you!',
@@ -79,9 +63,20 @@ export const ContactForm: FC<IContactFormProps> = ({ email, fullName }): JSX.Ele
             reset();
             setDisableForm(false);
           },
+        }),
+      )
+      .catch((_error) => {
+        toast({
+          title: 'Error',
+          duration: 5000,
+          status: 'error',
+          description: _error,
+          onCloseComplete: () => {
+            setDisableForm(false);
+            resetSendContactFormData();
+          },
         });
-      }
-    });
+      });
   });
 
   const shouldDisableForm = isSendContactFormDataLoading || disableForm;

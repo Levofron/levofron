@@ -1,3 +1,4 @@
+import { useToast } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { FC, useEffect } from 'react';
 
@@ -16,26 +17,41 @@ export const OnboardingStepFive: FC<IOnboardingStepFiveProps> = ({
 }): JSX.Element => {
   const {
     data: availableNotionPagesData,
-    execute: fetchAvailableNotionPages,
     loading: isAvailableNotionPagesLoading,
+    mutate: mutateAvailableNotionPages,
   } = useAxiosAction(restModule.getAvailableNotionPages);
 
+  const { loading: isSetNotionPageIdLoading, mutateAsync: mutateAsyncSetNotionPageId } =
+    useAxiosAction(restModule.setNotionPageId);
+
+  const toast = useToast();
   const router = useRouter();
 
-  const { execute: setNotionPageId, loading: isSetNotionPageIdLoading } = useAxiosAction(
-    restModule.setNotionPageId,
-  );
-
   useEffect(() => {
-    fetchAvailableNotionPages();
+    mutateAvailableNotionPages();
   }, []);
 
   const handleAvailableNotionPageClick = async (pageId: string) => {
-    const result = await setNotionPageId(pageId);
-
-    if (result) {
-      router.push(ERoutes.DASHBOARD);
-    }
+    mutateAsyncSetNotionPageId(pageId)
+      .then(() =>
+        toast({
+          duration: 5000,
+          status: 'success',
+          title: 'Success!',
+          description: 'You have successfully connected your Notion page!',
+          onCloseComplete: () => {
+            router.push(ERoutes.DASHBOARD);
+          },
+        }),
+      )
+      .catch((_error) => {
+        toast({
+          duration: 5000,
+          status: 'error',
+          title: 'Error!',
+          description: _error,
+        });
+      });
   };
 
   const renderAvailableNotionPages = () => {

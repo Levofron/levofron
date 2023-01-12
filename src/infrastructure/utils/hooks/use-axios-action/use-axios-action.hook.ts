@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 
-import { hasOwnProperty } from '@infrastructure/utils';
+import { isString } from '@infrastructure/utils';
 
-import { isAxiosError } from './utils/is-axios-error/is-axios-error.function';
+import { DEFAULT_ERROR_MESSAGE } from '@constants';
 
 type TCallback<TParam, TResponse> = (...params: TParam[]) => Promise<TResponse>;
 
@@ -11,52 +11,56 @@ export const useAxiosAction = <TParam, TResponse>(callback: TCallback<TParam, TR
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TResponse | null>(null);
 
-  const execute = useCallback(
-    async (...params: TParam[]) => {
-      setLoading(true);
-      let result: TResponse | null = null;
-
-      try {
-        const response = await callback(...params);
-
-        setData((result = response));
-      } catch (error) {
-        let errorMessage = 'Something went wrong';
-
-        if (isAxiosError(error)) {
-          const { data } = error.response!;
-
-          if (data && hasOwnProperty(data, 'message')) {
-            errorMessage = data.message as string;
+  const executeCallbackPromiseWrapper = async (...params: TParam[]) =>
+    new Promise<TResponse>((resolve, reject) => {
+      callback(...params)
+        .then(resolve)
+        .catch((_error) => {
+          if (isString(_error)) {
+            reject(_error);
           }
 
-          if (data && hasOwnProperty(data, 'body')) {
-            const parsedBody = JSON.parse(data.body as string);
-
-            errorMessage = parsedBody.message;
+          if (_error instanceof Error) {
+            reject(_error.message);
           }
-        }
 
-        setError(errorMessage);
-      } finally {
+          reject(DEFAULT_ERROR_MESSAGE);
+        });
+    });
+
+  const mutate = (...params: TParam[]) => {
+    setLoading(true);
+
+    executeCallbackPromiseWrapper(...params)
+      .then(setData)
+      .catch(setError)
+      .finally(() => {
         setLoading(false);
-      }
+      });
+  };
 
-      return result;
-    },
-    [callback],
-  );
+  const mutateAsync = async (...params: TParam[]) =>
+    new Promise<TResponse>((resolve, reject) => {
+      setLoading(true);
+
+      executeCallbackPromiseWrapper(...params)
+        .then((_response) => {
+          setData(_response);
+          resolve(_response);
+        })
+        .catch((_error) => {
+          setError(_error);
+          reject(_error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
 
   const reset = useCallback(() => {
     setData(null);
     setError(null);
   }, []);
 
-  const refetch = useCallback(async (...params: TParam[]) => {
-    reset();
-
-    return execute(...params);
-  }, []);
-
-  return { data, loading, error, execute, refetch, reset };
+  return { data, loading, error, mutate, mutateAsync, reset };
 };

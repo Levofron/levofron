@@ -7,18 +7,18 @@ import { useAxiosAction } from './use-axios-action.hook';
 describe('useAxiosAction hook', () => {
   functionImportTest(useAxiosAction);
 
-  it('should return loading, error, data and execute function', () => {
+  it('should return loading, error, data and mutate function', () => {
     const axiosAction = jest.fn().mockResolvedValue({ data: 'data' });
 
     const { result } = renderHook(() => useAxiosAction(axiosAction));
 
     expect(result.current).toEqual({
-      reset: expect.any(Function),
-      execute: expect.any(Function),
-      refetch: expect.any(Function),
       data: expect.any(Object),
       error: expect.any(Object),
+      reset: expect.any(Function),
+      mutate: expect.any(Function),
       loading: expect.any(Boolean),
+      mutateAsync: expect.any(Function),
     });
   });
 
@@ -28,7 +28,7 @@ describe('useAxiosAction hook', () => {
     const { result } = renderHook(() => useAxiosAction(axiosAction));
 
     act(() => {
-      result.current.execute();
+      result.current.mutate();
     });
 
     expect(axiosAction).toHaveBeenCalled();
@@ -42,7 +42,7 @@ describe('useAxiosAction hook', () => {
     expect(result.current.loading).toBeFalsy();
 
     act(() => {
-      result.current.execute();
+      result.current.mutate();
     });
 
     expect(result.current.loading).toBeTruthy();
@@ -54,13 +54,13 @@ describe('useAxiosAction hook', () => {
     const { result } = renderHook(() => useAxiosAction(axiosAction));
 
     act(() => {
-      result.current.execute();
+      result.current.mutate();
     });
 
     expect(result.current.loading).toBeTruthy();
 
     await act(async () => {
-      await result.current.execute();
+      await result.current.mutate();
     });
 
     expect(result.current.loading).toBeFalsy();

@@ -17,12 +17,12 @@ export const OnboardingStepFour: FC<IOnboardingStepFourProps> = ({
   const {
     data: setNotionApiTokenData,
     error: setNotionApiTokenError,
-    execute: setNotionApiToken,
     loading: isSetNotionApiTokenLoading,
+    mutateAsync: mutateAsyncSetNotionApiToken,
   } = useAxiosAction(restModule.setNotionApiToken);
 
   const handleInputChange = debounce(async (event: ChangeEvent<HTMLInputElement>) => {
-    const result = await setNotionApiToken(event.target.value);
+    const result = await mutateAsyncSetNotionApiToken(event.target.value);
 
     if (result) {
       onNextButtonClick();
