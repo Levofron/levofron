@@ -1,7 +1,16 @@
 import { useRouter } from 'next/router';
 import { FC } from 'react';
 
-import { Box, Button, Container, Flex, Heading, Highlight, Text } from '@ui/atoms';
+import {
+  Box,
+  Button,
+  Container,
+  Flex,
+  Heading,
+  Highlight,
+  ParticlesBackground,
+  Text,
+} from '@ui/atoms';
 
 import { ERoutes } from '@infrastructure/types/routes';
 import { useUser } from '@infrastructure/utils';
@@ -14,8 +23,9 @@ export const HomeHero: FC = (): JSX.Element => {
     router.push(user?.hasNotionData === true ? ERoutes.DASHBOARD : ERoutes.ONBOARDING);
 
   return (
-    <Box bg="gray.50" pt={65}>
-      <Container maxW="3xl">
+    <Box bg="gray.50" position="relative">
+      <ParticlesBackground />
+      <Container maxW="3xl" pt={65}>
         <Flex
           alignItems="center"
           flexDirection="column"
@@ -34,7 +44,7 @@ export const HomeHero: FC = (): JSX.Element => {
               Expand your vocabulary, elevate your skills
             </Highlight>
           </Heading>
-          <Text color="gray.500" fontSize={{ base: 'xs', sm: 'sm', md: 'md' }}>
+          <Text color="gray.900" fontSize={{ base: 'xs', sm: 'sm', md: 'md' }}>
             Elevate your vocabulary with our cutting-edge app! Our intuitive platform allows you to
             easily learn new words and phrases from your own <b>Notion</b> database!
           </Text>
