@@ -5,7 +5,13 @@ import { Box, ChakraNextLink, Container, Flex, SimpleGrid, Stack, Text } from '@
 
 import { ERoutes } from '@infrastructure/types/routes';
 
-import { BUY_ME_A_COFFEE_LINK, GITHUB_LINK, LINKEDIN_LINK, TWITTER_LINK } from '@constants';
+import {
+  BUY_ME_A_COFFEE_LINK,
+  GITHUB_LINK,
+  LINKEDIN_LINK,
+  PAYPAL_LINK,
+  TWITTER_LINK,
+} from '@constants';
 
 export const Footer: FC = (): JSX.Element => {
   const currentYear = new Date().getUTCFullYear();
@@ -48,6 +54,15 @@ export const Footer: FC = (): JSX.Element => {
                 alt="Buy Me A Coffee"
                 height={40}
                 src="https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-1.svg"
+                width={142.47}
+              />
+            </ChakraNextLink>
+            <ChakraNextLink href={PAYPAL_LINK} target="_blank">
+              <NextImage
+                alt="PayPal"
+                height={40}
+                src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-color.svg"
+                style={{ borderRadius: '6px' }}
                 width={142.47}
               />
             </ChakraNextLink>

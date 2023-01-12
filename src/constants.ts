@@ -21,5 +21,5 @@ export const GITHUB_LINK = 'https://github.com/playerony';
 export const CONTACT_EMAIL = 'pawel.wojtasinski.1995@gmail.com;';
 export const TWITTER_LINK = 'https://twitter.com/wojtasinskipawe';
 export const LINKEDIN_LINK = 'https://linkedin.com/in/pwojtasinski';
-export const PAYPAL_LINK = 'https://www.paypal.com/paypalme/playerony';
 export const BUY_ME_A_COFFEE_LINK = 'https://buymeacoffee.com/playerony';
+export const PAYPAL_LINK = 'https://www.paypal.com/donate/?hosted_button_id=XQC5QN5G4JJW2';
